@@ -7,77 +7,74 @@ import java.util.*;
  */
 
 public class Main {
-    static InputReader reader;
-    static PrintWriter writer = new PrintWriter(System.out);
+    static FastIO io;
 
-    public static void main(String[] args) {
-        reader = InputReader.of(args);
+    public static void main(String[] args) throws IOException {
+        io = new FastIO(args);
 
         // do something
 
-        writer.close();
+        io.flush();
+    }
+
+    static class FastIO {
+        private BufferedInputStream in;
+        private PrintStream out;
+        private final int bufferSize;
+
+        FastIO(String[] args) {
+            bufferSize = 1 << 16;
+            InputStream inputStream = null;
+            if (Arrays.asList(args).contains("--local")) {
+                try {
+                    inputStream = new FileInputStream("input.txt");
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                inputStream = System.in;
+            }
+            in = new BufferedInputStream(inputStream, bufferSize);
+            out = new PrintStream(new BufferedOutputStream(System.out, bufferSize));
+        }
+
+        String next() throws IOException {
+            StringBuilder stringBuilder = new StringBuilder();
+            int b;
+            while (isDelimiter(b = in.read()));
+            while (!isDelimiter(b)) {
+                stringBuilder.append((char) b);
+                b = in.read();
+            }
+            return stringBuilder.toString();
+        }
+
+        int nextInt() throws IOException {
+            int integer = 0;
+            int sign = 1;
+            int b;
+            while (isDelimiter(b = in.read()));
+            if (b == '-') {
+                sign = -1;
+            }
+            while (!isDelimiter(b)) {
+                integer = integer * 10 + b - '0';
+                b = in.read();
+            }
+            return sign * integer;
+        }
+
+        boolean isDelimiter(int c) {
+            return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == -1;
+        }
+
+        PrintStream printf(String format, Object ...args) {
+            return out.printf(format, args);
+        }
+
+        void flush() throws IOException {
+            out.flush();
+        }
     }
 }
 
-class InputReader {
-    private InputStream in;
-    private final byte[] buffer;
-    private final int bufferSize;
-    private int readCount;
-    private int bufferIndex;
-
-    private InputReader(InputStream inputStream) {
-        bufferSize = 1 << 16;
-        buffer = new byte[bufferSize];
-        in = inputStream;
-    }
-
-    static InputReader of(String[] args) {
-        if (Arrays.asList(args).contains("--local")) {
-            try {
-                return new InputReader(new FileInputStream("input.txt"));
-            } catch (Exception e) {
-                throw new RuntimeException();
-            }
-        } else {
-            return new InputReader(System.in);
-        }
-    }
-
-    int fill() {
-        try {
-            readCount = in.read(buffer, bufferIndex = 0, bufferSize);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-        return readCount;
-    }
-
-    int read() {
-        if (bufferIndex >= readCount) {
-            if (fill() < 1) {
-                return -1;
-            }
-        }
-        return buffer[bufferIndex++];
-    }
-
-    String next() {
-        StringBuilder stringBuilder = new StringBuilder();
-        int c;
-        while (isDelimiter(c = read()));
-        while (!isDelimiter(c) && c != -1) {
-            stringBuilder.append((char) c);
-            c = read();
-        };
-        return stringBuilder.toString();
-    }
-
-    int nextInt() {
-        return Integer.parseInt(next());
-    }
-
-    boolean isDelimiter(int c) {
-        return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f';
-    }
-}
