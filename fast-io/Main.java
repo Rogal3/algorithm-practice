@@ -17,63 +17,48 @@ public class Main {
         io.flush();
     }
 
-    static class FastIO {
-        private BufferedInputStream in;
-        private PrintStream out;
-        private final int bufferSize;
+    static class FastIO extends PrintStream {
+        private static final int bufferSize = 1 << 16;
+        private InputStream in;
 
-        FastIO(String[] args) {
-            bufferSize = 1 << 16;
-            InputStream inputStream = null;
+        FastIO(String[] args) throws IOException {
+            super(new BufferedOutputStream(System.out, bufferSize));
+            InputStream inputStream;
             if (Arrays.asList(args).contains("--local")) {
-                try {
-                    inputStream = new FileInputStream("input.txt");
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+                inputStream = new FileInputStream("input.txt");
             } else {
                 inputStream = System.in;
             }
             in = new BufferedInputStream(inputStream, bufferSize);
-            out = new PrintStream(new BufferedOutputStream(System.out, bufferSize));
         }
 
         String next() throws IOException {
             StringBuilder stringBuilder = new StringBuilder();
             int b;
             while (isDelimiter(b = in.read()));
-            while (!isDelimiter(b)) {
+            do {
                 stringBuilder.append((char) b);
-                b = in.read();
-            }
+            } while (!isDelimiter(b = in.read()));
             return stringBuilder.toString();
         }
 
         int nextInt() throws IOException {
-            int integer = 0;
+            int mag = 0;
             int sign = 1;
             int b;
             while (isDelimiter(b = in.read()));
             if (b == '-') {
                 sign = -1;
-            }
-            while (!isDelimiter(b)) {
-                integer = integer * 10 + b - '0';
                 b = in.read();
             }
-            return sign * integer;
+            do {
+                mag = mag * 10 + b - '0';
+            } while (!isDelimiter(b = in.read()));
+            return sign * mag;
         }
 
         boolean isDelimiter(int c) {
             return c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == -1;
-        }
-
-        PrintStream printf(String format, Object ...args) {
-            return out.printf(format, args);
-        }
-
-        void flush() throws IOException {
-            out.flush();
         }
     }
 }
