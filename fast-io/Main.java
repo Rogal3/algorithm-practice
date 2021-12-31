@@ -2,58 +2,71 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @see
+ * @see 
  * @author rogal
  */
 
 public class Main {
     static FastIO io;
 
-    public static void main(String[] args) throws IOException {
-        io = new FastIO(args);
+    public static void main(String[] args) {
+        io = FastIO.of(args);
 
         // do something
 
         io.flush();
     }
 
-    static class FastIO extends PrintStream {
+    static class FastIO extends PrintWriter {
         private static final int bufferSize = 1 << 16;
         private InputStream in;
 
-        FastIO(String[] args) throws IOException {
-            super(new BufferedOutputStream(System.out, bufferSize));
-            InputStream inputStream;
-            if (Arrays.asList(args).contains("--local")) {
-                inputStream = new FileInputStream("input.txt");
-            } else {
-                inputStream = System.in;
-            }
-            in = new BufferedInputStream(inputStream, bufferSize);
+        private FastIO(InputStream in, boolean autoFlush) {
+            super(new BufferedOutputStream(System.out, bufferSize), autoFlush);
+            this.in = new BufferedInputStream(in, bufferSize);
         }
 
-        String next() throws IOException {
+        static FastIO of(String[] args) {
+            if (Arrays.asList(args).contains("--local")) {
+                try {
+                    return new FastIO(new FileInputStream("input.txt"), true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            return new FastIO(System.in, false);
+        }
+
+        String next() {
             StringBuilder stringBuilder = new StringBuilder();
             int b;
-            while (isDelimiter(b = in.read()));
-            do {
-                stringBuilder.append((char) b);
-            } while (!isDelimiter(b = in.read()));
+            try {
+                while (isDelimiter(b = in.read()));
+                do {
+                    stringBuilder.append((char) b);
+                } while (!isDelimiter(b = in.read()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             return stringBuilder.toString();
         }
 
-        int nextInt() throws IOException {
+        int nextInt() {
             int mag = 0;
             int sign = 1;
             int b;
-            while (isDelimiter(b = in.read()));
-            if (b == '-') {
-                sign = -1;
-                b = in.read();
+            try {
+                while (isDelimiter(b = in.read()));
+                if (b == '-') {
+                    sign = -1;
+                    b = in.read();
+                }
+                do {
+                    mag = mag * 10 + b - '0';
+                } while (!isDelimiter(b = in.read()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            do {
-                mag = mag * 10 + b - '0';
-            } while (!isDelimiter(b = in.read()));
             return sign * mag;
         }
 
