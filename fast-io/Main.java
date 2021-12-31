@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 /**
- * @see 
+ * @see
  * @author rogal
  */
 
@@ -22,7 +22,7 @@ public class Main {
         private InputStream in;
 
         private FastIO(InputStream in, boolean autoFlush) {
-            super(new BufferedOutputStream(System.out, bufferSize), autoFlush);
+            super(new BufferedWriter(new OutputStreamWriter(System.out), bufferSize), autoFlush);
             this.in = new BufferedInputStream(in, bufferSize);
         }
 
@@ -75,4 +75,3 @@ public class Main {
         }
     }
 }
-
